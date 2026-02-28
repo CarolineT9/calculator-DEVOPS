@@ -25,7 +25,7 @@ jobs:
       - name: Deploy to S3
         run: |
           aws s3 sync . s3://disciplina-devops-puc/ --exclude ".git/*" --delete --exact-timestamps
-        # 'disciplina-devops-puc' é o nome do seu bucket no S3
+        
         # --delete remove arquivos antigos no S3 que não existem mais no repositório
 
       - name: Setup Node
