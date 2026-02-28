@@ -1,4 +1,5 @@
-const display = typeof document !== "undefined" ? document.getElementById("display") : null;
+const display =
+  typeof document !== "undefined" ? document.getElementById("display") : null;
 let buffer = "";
 
 function render() {
