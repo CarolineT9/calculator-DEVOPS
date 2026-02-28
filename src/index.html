@@ -1,19 +1,62 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Calculadora JS</title>
     <style>
-      body { font-family: sans-serif; margin: 2rem; }
-      .calc { max-width: 360px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-      input[type="text"] { grid-column: span 4; font-size: 1.2rem; padding: .5rem; }
-      button { padding: .75rem; font-size: 1rem; }
-      .wide { grid-column: span 2; }
+      body {
+        font-family: sans-serif;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e4e0e0;
+      }
+      .calc {
+        max-width: 360px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        background: #464343;
+        padding: 2rem 1.5rem;
+        border-radius: 1rem;
+        box-shadow: 0 2px 16px #0001;
+      }
+      input[type="text"] {
+        grid-column: span 4;
+        font-size: 1.2rem;
+        padding: 0.5rem;
+      }
+      button {
+        padding: 0.75rem;
+        font-size: 1rem;
+      }
+      .wide {
+        grid-column: span 2;
+      }
+      h1 {
+        position: absolute;
+        top: 10rem;
+        font-size: 1.5rem;
+        color: #333;
+      }
+      .orange {
+        background: #e95629;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+      }
+      #display {
+        border: none;
+        border-radius: 0.5rem;
+        text-align: right;
+      }
     </style>
   </head>
   <body>
-    <h1>Calculadora JS</h1>
+    <h1>T h e C a l c u l a t o r</h1>
     <div class="calc">
       <input id="display" type="text" readonly />
       <button data-k="7">7</button>
@@ -27,14 +70,13 @@
       <button data-k="1">1</button>
       <button data-k="2">2</button>
       <button data-k="3">3</button>
-      <button data-k="-">-</button>
+      <button data-k="-" class="orange">-</button>
       <button class="wide" data-k="0">0</button>
-      <button data-k=".">.</button>
-      <button data-k="+">+</button>
-      <button class="wide" id="clear">C</button>
-      <button class="wide" id="equals">=</button>
+      <button data-k="." class="orange">.</button>
+      <button data-k="+" class="orange">+</button>
+      <button class="wide" id="clear" class="orange">C</button>
+      <button class="wide" id="equals" class="orange">=</button>
     </div>
     <script src="./main.js"></script>
   </body>
 </html>
-
