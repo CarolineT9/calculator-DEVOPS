@@ -25,7 +25,7 @@ jobs:
       - name: Deploy to S3
         run: |
           aws s3 sync dist/ s3://disciplina-devops-puc/ --delete
-          
+          aws s3 sync . s3://disciplina-devops-puc/ --exclude ".git/*" --delete --exact-timestamps
       # 4. Configuração do Node.js
       - name: Setup Node
         uses: actions/setup-node@v4
