@@ -7,35 +7,55 @@ on:
     branches: [main]
 
 jobs:
-  test-and-deploy:
+  test-infra-deploy:
     runs-on: ubuntu-latest
-  
+
     steps:
+      # 1️⃣ Checkout do código
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Setup Node
+      # 2️⃣ Setup Node
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      # Install dependencies
+      # 3️⃣ Instalar dependências
       - name: Install dependencies
         run: npm install
 
-      # Run tests
+      # 4️⃣ Rodar testes
       - name: Run tests
         run: npm test
 
-      # Configure AWS credentials
+      # 5️⃣ Configurar credenciais AWS
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: sa-east-1 
+          aws-region: sa-east-1
 
-      # Deploy
+      # 6️⃣ Instalar Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # 7️⃣ Terraform Init
+      - name: Terraform Init
+        working-directory: infra
+        run: terraform init
+
+      # 8️⃣ Terraform Validate
+      - name: Terraform Validate
+        working-directory: infra
+        run: terraform validate
+
+      # 9️⃣ Terraform Apply
+      - name: Terraform Apply
+        working-directory: infra
+        run: terraform apply -auto-approve
+
+      # 🔟 Deploy para o bucket criado via Terraform
       - name: Deploy to S3
-        run: aws s3 sync src/ s3://disciplina-devops-puc/ --delete
+        run: aws s3 sync src/ s3://disciplina-devops-puc-terraform-caroline/ --delete
