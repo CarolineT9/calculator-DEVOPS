@@ -24,8 +24,8 @@ jobs:
       # 3. Enviar os arquivos para o S3
       - name: Deploy to S3
         run: |
-          aws s3 sync . s3://disciplina-devops-puc/ --exclude ".git/*" --delete --exact-timestamps
-
+          aws s3 sync dist/ s3://disciplina-devops-puc/ --delete
+          
       # 4. Configuração do Node.js
       - name: Setup Node
         uses: actions/setup-node@v4
