@@ -25,13 +25,13 @@ jobs:
       - name: Deploy to S3
         run: |
           aws s3 sync . s3://disciplina-devops-puc/ --exclude ".git/*" --delete --exact-timestamps
-        
 
+      # 4. Configuração do Node.js
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
-
+      #Instalação das dependências e execução dos testes
       - name: Install dependencies
         run: npm install
 
