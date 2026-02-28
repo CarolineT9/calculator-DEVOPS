@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    #checkout do codigo, setup do node, install das dependencias e rodar os testes
+  
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
