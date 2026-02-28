@@ -1,0 +1,13 @@
+{
+  "name": "calculator",
+  "version": "1.0.0",
+  "description": "Calculadora simples em JavaScript para demonstração de CI/CD no GitLab",
+  "private": true,
+  "scripts": {
+    "test": "jest --ci",
+    "start": "node src/main.js"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
