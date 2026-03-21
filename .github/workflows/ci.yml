@@ -56,6 +56,14 @@ jobs:
         working-directory: infra
         run: terraform apply -auto-approve
 
-      # 🔟 Deploy para o bucket criado via Terraform
-      - name: Deploy to S3
-        run: aws s3 sync src/ s3://disciplina-devops-puc-terraform-caroline/ --delete
+      # 🔟 Build da imagem Docker
+      - name: Build Docker image
+        run: docker build -t calculator-app .
+
+      # 1️⃣1️⃣ Rodar container (teste simples)
+      - name: Run Docker container
+        run: docker run -d -p 8080:80 calculator-app
+
+      # 1️⃣2️⃣ Testar se subiu
+      - name: Test container
+        run: curl http://localhost:8080
