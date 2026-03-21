@@ -55,6 +55,30 @@ jobs:
         working-directory: infra
         run: terraform import aws_s3_bucket.calculator_bucket disciplina-devops-caroline-b2 || true
 
+      - name: Import existing ECR repository
+        working-directory: infra
+        run: terraform import aws_ecr_repository.calculator calculator-app || true
+
+      - name: Import existing ECS cluster
+        working-directory: infra
+        run: terraform import aws_ecs_cluster.calculator calculator-cluster || true
+
+      - name: Import existing CloudWatch log group
+        working-directory: infra
+        run: terraform import aws_cloudwatch_log_group.calculator /ecs/calculator || true
+
+      - name: Import existing IAM role
+        working-directory: infra
+        run: terraform import aws_iam_role.ecs_task_execution_role ecs-task-execution-role-calculator || true
+
+      - name: Import existing security group
+        working-directory: infra
+        run: |
+          SG_ID=$(aws ec2 describe-security-groups --group-names ecs-security-group --query 'SecurityGroups[0].GroupId' --output text 2>/dev/null || echo "")
+          if [ -n "$SG_ID" ]; then
+            terraform import aws_security_group.ecs $SG_ID || true
+          fi
+
       - name: Terraform Apply
         working-directory: infra
         run: terraform apply -auto-approve -refresh=true
