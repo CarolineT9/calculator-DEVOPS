@@ -59,6 +59,42 @@ jobs:
         working-directory: infra
         run: terraform apply -auto-approve -refresh=true
 
+      - name: Get Terraform Outputs
+        working-directory: infra
+        id: terraform
+        run: |
+          echo "ecr_repo=$(terraform output -raw ecr_repository_url)" >> $GITHUB_OUTPUT
+          echo "ecs_cluster=$(terraform output -raw ecs_cluster_name)" >> $GITHUB_OUTPUT
+          echo "ecs_service=$(terraform output -raw ecs_service_name)" >> $GITHUB_OUTPUT
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build Docker image for ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: calculator-app
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Push Docker image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: calculator-app
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Update ECS service
+        run: |
+          aws ecs update-service \
+            --cluster ${{ steps.terraform.outputs.ecs_cluster }} \
+            --service ${{ steps.terraform.outputs.ecs_service }} \
+            --force-new-deployment
       
       - name: Install docker-compose
         run: |
@@ -68,6 +104,12 @@ jobs:
       
       - name: Build and run with Docker Compose
         run: docker compose up -d
+
+      - name: Wait for container
+        run: sleep 5
+
+      - name: Test container
+        run: curl http://localhost:8080
 
       - name: Clean up containers
         run: docker compose down
