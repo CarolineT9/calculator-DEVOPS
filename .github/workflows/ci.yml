@@ -60,21 +60,17 @@ jobs:
         run: terraform apply -auto-approve -refresh=true
 
       
-      - name: Build Docker image
-        run: docker build -t calculator-app .
+      - name: Build and run with Docker Compose
+        run: docker-compose up -d
 
-      
-      - name: Run Docker container
-        run: docker run -d -p 8080:80 calculator-app
-
-      
       - name: Wait for container
         run: sleep 5
 
-      
       - name: Test container
         run: curl http://localhost:8080
 
-      
+      - name: Clean up containers
+        run: docker-compose down
+
       - name: Deploy to S3
         run: aws s3 sync src/ s3://disciplina-devops-caroline-b2/ --delete

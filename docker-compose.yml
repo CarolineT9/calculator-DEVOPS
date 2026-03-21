@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  calculator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: calculator-app
+    ports:
+      - "8080:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
