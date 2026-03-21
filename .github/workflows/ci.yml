@@ -79,6 +79,10 @@ jobs:
             terraform import aws_security_group.ecs $SG_ID || true
           fi
 
+      - name: Import existing ECS service
+        working-directory: infra
+        run: terraform import aws_ecs_service.calculator calculator-cluster/calculator-service || true
+
       - name: Terraform Apply
         working-directory: infra
         run: terraform apply -auto-approve -refresh=true
