@@ -48,7 +48,7 @@ resource "aws_ecs_task_definition" "calculator" {
         logDriver = "awslogs"
         options = {
           "awslogs-group"         = aws_cloudwatch_log_group.calculator.name
-          "awslogs-region"        = var.aws_region
+          "awslogs-region"        = "sa-east-1"
           "awslogs-stream-prefix" = "ecs"
         }
       }
@@ -60,6 +60,47 @@ resource "aws_ecs_task_definition" "calculator" {
   }
 }
 
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
+data "aws_vpc" "default" {
+  default = true
+}
+
+resource "aws_security_group" "ecs" {
+  name   = "ecs-security-group"
+  vpc_id = data.aws_vpc.default.id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "ecs-security-group"
+  }
+}
+
 resource "aws_ecs_service" "calculator" {
   name            = "calculator-service"
   cluster         = aws_ecs_cluster.calculator.id
@@ -68,7 +109,7 @@ resource "aws_ecs_service" "calculator" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = [aws_subnet.public.id]
+    subnets          = data.aws_subnets.default.ids
     security_groups  = [aws_security_group.ecs.id]
     assign_public_ip = true
   }
@@ -92,7 +133,7 @@ resource "aws_cloudwatch_log_group" "calculator" {
 }
 
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "ecs-task-execution-role"
+  name = "ecs-task-execution-role-calculator"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -106,6 +147,10 @@ resource "aws_iam_role" "ecs_task_execution_role" {
       }
     ]
   })
+
+  tags = {
+    Name = "ecs-task-execution-role"
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
@@ -131,73 +176,4 @@ resource "aws_iam_role_policy" "ecs_task_execution_ecr_policy" {
       }
     ]
   })
-}
-
-resource "aws_vpc" "calculator" {
-  cidr_block           = "10.0.0.0/16"
-  enable_dns_hostnames = true
-  enable_dns_support   = true
-
-  tags = {
-    Name = "calculator-vpc"
-  }
-}
-
-resource "aws_subnet" "public" {
-  vpc_id            = aws_vpc.calculator.id
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = "${var.aws_region}a"
-
-  tags = {
-    Name = "calculator-public-subnet"
-  }
-}
-
-resource "aws_internet_gateway" "calculator" {
-  vpc_id = aws_vpc.calculator.id
-
-  tags = {
-    Name = "calculator-igw"
-  }
-}
-
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.calculator.id
-
-  route {
-    cidr_block      = "0.0.0.0/0"
-    gateway_id      = aws_internet_gateway.calculator.id
-  }
-
-  tags = {
-    Name = "calculator-public-rt"
-  }
-}
-
-resource "aws_route_table_association" "public" {
-  subnet_id      = aws_subnet.public.id
-  route_table_id = aws_route_table.public.id
-}
-
-resource "aws_security_group" "ecs" {
-  name   = "ecs-security-group"
-  vpc_id = aws_vpc.calculator.id
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "ecs-security-group"
-  }
 }
