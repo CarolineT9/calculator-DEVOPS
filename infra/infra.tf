@@ -1,1 +1,0 @@
-# Backend configurado - deixar vazio para usar state local com -refresh=true
