@@ -54,7 +54,7 @@ jobs:
      
       - name: Terraform Apply
         working-directory: infra
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -refresh=true
 
       
       - name: Build Docker image
