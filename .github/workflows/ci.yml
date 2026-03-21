@@ -51,7 +51,10 @@ jobs:
         working-directory: infra
         run: terraform validate
 
-     
+      - name: Import existing S3 bucket
+        working-directory: infra
+        run: terraform import aws_s3_bucket.calculator_bucket disciplina-devops-caroline-b2 || true
+
       - name: Terraform Apply
         working-directory: infra
         run: terraform apply -auto-approve -refresh=true
