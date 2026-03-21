@@ -1,0 +1,1 @@
+bucket_name = "disciplina-devops-puc-caroline-b1"
