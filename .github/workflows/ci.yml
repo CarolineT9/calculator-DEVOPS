@@ -71,3 +71,7 @@ jobs:
       # 1️⃣3️⃣ Testar se subiu
       - name: Test container
         run: curl http://localhost:8080
+        
+      # 1️⃣4️⃣ Deploy para o S3
+      - name: Deploy to S3
+        run: aws s3 sync src/ s3://disciplina-devops-caroline-final/ --delete

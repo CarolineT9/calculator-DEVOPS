@@ -1,1 +1,1 @@
-bucket_name = "disciplina-devops-puc-caroline-b1"
+bucket_name = "disciplina-devops-caroline-b2"
